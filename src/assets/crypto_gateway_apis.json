@@ -1,0 +1,1846 @@
+{
+	"info": {
+		"_postman_id": "solana-gateway-2024",
+		"name": "Globpay Crypto Gateway API",
+		"description": "Complete API collection for Solana Gateway service. This gateway integrates with HexPay Solana Merchant APIs and stores merchant sessions, deposits, addresses, and withdrawals in MySQL.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Merchant Management",
+			"item": [
+				{
+					"name": "Create Merchant",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set(\"merchant_api_key\", jsonData.merchant.api_key);",
+									"    pm.environment.set(\"merchant_id\", jsonData.merchant.id);",
+									"    console.log(\"Merchant created successfully!\");",
+									"    console.log(\"API Key: \" + jsonData.merchant.api_key);",
+									"    console.log(\"⚠️ Save this API key - it won't be shown again!\");",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{merchant_api_key}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"{{merchant_email}}\",\n    \"password\": \"{{merchant_password}}\",\n    \"business_name\": \"My Business\"\n}"
+						},
+						"url": {
+							"raw": "{{gateway_base_url}}/api/admin/merchants",
+							"host": [
+								"{{gateway_base_url}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"merchants"
+							]
+						},
+						"description": "Create a new merchant account. Requires admin authentication. Returns an API key that should be used as Bearer token for all subsequent requests."
+					},
+					"response": [
+						{
+							"name": "Success - Merchant Created",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"merchant@example.com\",\n    \"password\": \"SecurePassword123!\",\n    \"business_name\": \"My Business\"\n}"
+								},
+								"url": {
+									"raw": "{{gateway_base_url}}/api/admin/merchants",
+									"host": ["{{gateway_base_url}}"],
+									"path": ["api", "admin", "merchants"]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"Merchant created successfully\",\n    \"merchant\": {\n        \"id\": 1,\n        \"email\": \"merchant@example.com\",\n        \"business_name\": \"My Business\",\n        \"api_key\": \"sk_abc123xyz456def789ghi012jkl345mno678pqr901stu234vwx567yz\",\n        \"merchant_id\": 1,\n        \"is_active\": true,\n        \"created_at\": \"2024-01-15T10:30:00Z\"\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "List Merchants",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{merchant_api_key}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{gateway_base_url}}/api/admin/merchants",
+							"host": [
+								"{{gateway_base_url}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"merchants"
+							]
+						},
+						"description": "List all merchants in the system. Requires admin authentication. Note: This endpoint now uses pagination - see Admin APIs section for paginated version."
+					},
+					"response": [
+						{
+							"name": "Success - List Merchants",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{gateway_base_url}}/api/admin/merchants",
+									"host": ["{{gateway_base_url}}"],
+									"path": ["api", "admin", "merchants"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"merchants\": [\n        {\n            \"id\": 1,\n            \"email\": \"merchant@example.com\",\n            \"business_name\": \"My Business\",\n            \"api_key\": \"sk_abc123xyz456def789ghi012jkl345mno678pqr901stu234vwx567yz\",\n            \"merchant_id\": 1,\n            \"usdt_balance\": 100.5,\n            \"kes_balance\": 5000.0,\n            \"is_active\": true,\n            \"created_at\": \"2024-01-15T10:30:00Z\"\n        }\n    ],\n    \"count\": 1\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Merchant",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{merchant_api_key}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{gateway_base_url}}/api/admin/merchants/{{merchant_id}}",
+							"host": [
+								"{{gateway_base_url}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"merchants",
+								"{{merchant_id}}"
+							]
+						},
+						"description": "Get merchant details by ID. Requires admin authentication."
+					},
+					"response": [
+						{
+							"name": "Success - Get Merchant",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{gateway_base_url}}/api/admin/merchants/1",
+									"host": ["{{gateway_base_url}}"],
+									"path": ["api", "admin", "merchants", "1"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": 1,\n    \"email\": \"merchant@example.com\",\n    \"business_name\": \"My Business\",\n    \"api_key\": \"sk_abc123xyz456def789ghi012jkl345mno678pqr901stu234vwx567yz\",\n    \"merchant_id\": 1,\n    \"usdt_balance\": 100.5,\n    \"trc20_address\": \"TRXAddressHere\",\n    \"is_active\": true,\n    \"created_at\": \"2024-01-15T10:30:00Z\",\n    \"updated_at\": \"2024-01-15T10:30:00Z\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Update Merchant",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{merchant_api_key}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"business_name\": \"Updated Business Name\",\n    \"is_active\": true\n}"
+						},
+						"url": {
+							"raw": "{{gateway_base_url}}/api/admin/merchants/{{merchant_id}}",
+							"host": [
+								"{{gateway_base_url}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"merchants",
+								"{{merchant_id}}"
+							]
+						},
+						"description": "Update merchant information. Requires admin authentication."
+					},
+					"response": [
+						{
+							"name": "Success - Merchant Updated",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"business_name\": \"Updated Business Name\",\n    \"is_active\": true\n}"
+								},
+								"url": {
+									"raw": "{{gateway_base_url}}/api/admin/merchants/1",
+									"host": ["{{gateway_base_url}}"],
+									"path": ["api", "admin", "merchants", "1"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"Merchant updated successfully\",\n    \"merchant\": {\n        \"id\": 1,\n        \"email\": \"merchant@example.com\",\n        \"business_name\": \"Updated Business Name\",\n        \"is_active\": true,\n        \"updated_at\": \"2024-01-15T10:35:00Z\"\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Regenerate API Key",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set(\"merchant_api_key\", jsonData.api_key);",
+									"    console.log(\"New API Key: \" + jsonData.api_key);",
+									"    console.log(\"⚠️ Update your API key in environment variables!\");",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{merchant_api_key}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{gateway_base_url}}/api/admin/merchants/{{merchant_id}}/regenerate-api-key",
+							"host": [
+								"{{gateway_base_url}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"merchants",
+								"{{merchant_id}}",
+								"regenerate-api-key"
+							]
+						},
+						"description": "Regenerate API key for a merchant. The old API key will be invalidated. Requires admin authentication."
+					},
+					"response": [
+						{
+							"name": "Success - API Key Regenerated",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{gateway_base_url}}/api/admin/merchants/1/regenerate-api-key",
+									"host": ["{{gateway_base_url}}"],
+									"path": ["api", "admin", "merchants", "1", "regenerate-api-key"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"API key regenerated successfully\",\n    \"api_key\": \"sk_new123xyz456def789ghi012jkl345mno678pqr901stu234vwx567yz\"\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Admin APIs",
+			"item": [
+				{
+					"name": "List All Merchants (Paginated)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{merchant_api_key}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{gateway_base_url}}/api/admin/merchants?page=1&limit=20",
+							"host": [
+								"{{gateway_base_url}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"merchants"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1",
+									"description": "Page number (default: 1)"
+								},
+								{
+									"key": "limit",
+									"value": "20",
+									"description": "Items per page (default: 20, max: 100)"
+								}
+							]
+						},
+						"description": "List all merchants with pagination. Requires admin authentication."
+					},
+					"response": [
+						{
+							"name": "Success - Merchants List",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{gateway_base_url}}/api/admin/merchants?page=1&limit=20",
+									"host": ["{{gateway_base_url}}"],
+									"path": ["api", "admin", "merchants"],
+									"query": [{"key": "page", "value": "1"}, {"key": "limit", "value": "20"}]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [{"key": "Content-Type", "value": "application/json"}],
+							"cookie": [],
+							"body": "{\n    \"merchants\": [\n        {\n            \"id\": 1,\n            \"email\": \"merchant@example.com\",\n            \"business_name\": \"My Business\",\n            \"api_key\": \"sk_abc123xyz456def789ghi012jkl345mno678pqr901stu234vwx567yz\",\n            \"merchant_id\": 1,\n            \"usdt_balance\": 100.5,\n            \"solana_address\": \"7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU\",\n            \"is_active\": true,\n            \"is_admin\": false,\n            \"created_at\": \"2024-01-15T10:30:00Z\",\n            \"updated_at\": \"2024-01-15T10:30:00Z\"\n        }\n    ],\n    \"pagination\": {\n        \"page\": 1,\n        \"limit\": 20,\n        \"total\": 50,\n        \"total_pages\": 3\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "List All Transactions (Paginated)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{merchant_api_key}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{gateway_base_url}}/api/admin/transactions?page=1&limit=20&merchant_id=&status=",
+							"host": [
+								"{{gateway_base_url}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"transactions"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1",
+									"description": "Page number (default: 1)"
+								},
+								{
+									"key": "limit",
+									"value": "20",
+									"description": "Items per page (default: 20, max: 100)"
+								},
+								{
+									"key": "merchant_id",
+									"value": "",
+									"description": "Optional: Filter by merchant ID",
+									"disabled": true
+								},
+								{
+									"key": "status",
+									"value": "",
+									"description": "Optional: Filter by status (pending, completed, failed)",
+									"disabled": true
+								}
+							]
+						},
+						"description": "List all transactions across all merchants with pagination. Optional filters: merchant_id, status. Requires admin authentication."
+					},
+					"response": [
+						{
+							"name": "Success - Transactions List",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{gateway_base_url}}/api/admin/transactions?page=1&limit=20",
+									"host": ["{{gateway_base_url}}"],
+									"path": ["api", "admin", "transactions"],
+									"query": [{"key": "page", "value": "1"}, {"key": "limit", "value": "20"}]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [{"key": "Content-Type", "value": "application/json"}],
+							"cookie": [],
+							"body": "{\n    \"transactions\": [\n        {\n            \"id\": 1,\n            \"deposit_id\": 13,\n            \"merchant_deposit_id\": \"ORDER-12345\",\n            \"merchant_id\": 1,\n            \"merchant_email\": \"merchant@example.com\",\n            \"solana_address\": \"A9xLqgmfdW3QXnFw7kwmRDzGBbQV2uMDGv95BgFp11g8\",\n            \"amount\": 0.1,\n            \"asset\": \"USDT\",\n            \"status\": \"completed\",\n            \"tx_id\": \"2ABLi5JpedbVF4bD3yQmQ3c2Bpfs924CtSs2rhEnvobkjxgc4M7grv7ZWJrCzi5uceCZpSs3mCjKNdBuMae6BYeJ\",\n            \"slot\": 394501791,\n            \"confirmations\": 1,\n            \"created_at\": \"2024-01-15T10:30:00Z\",\n            \"updated_at\": \"2024-01-15T10:35:00Z\"\n        },\n        {\n            \"id\": 2,\n            \"deposit_id\": 14,\n            \"merchant_deposit_id\": \"ORDER-12346\",\n            \"merchant_id\": 2,\n            \"merchant_email\": \"merchant2@example.com\",\n            \"solana_address\": \"B8yMqrgeW4RYoGw8lxmSEzHCcRV3vNEHw96ChGq22h9H\",\n            \"amount\": 0.2,\n            \"asset\": \"USDT\",\n            \"status\": \"pending\",\n            \"tx_id\": \"\",\n            \"slot\": 0,\n            \"confirmations\": 0,\n            \"created_at\": \"2024-01-15T10:40:00Z\",\n            \"updated_at\": \"2024-01-15T10:40:00Z\"\n        }\n    ],\n    \"pagination\": {\n        \"page\": 1,\n        \"limit\": 20,\n        \"total\": 150,\n        \"total_pages\": 8\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Make Merchant Admin",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{merchant_api_key}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{gateway_base_url}}/api/admin/merchants/{{merchant_id}}/make-admin",
+							"host": [
+								"{{gateway_base_url}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"merchants",
+								"{{merchant_id}}",
+								"make-admin"
+							]
+						},
+						"description": "Promote a merchant to admin status. Requires admin authentication."
+					},
+					"response": [
+						{
+							"name": "Success - Merchant Promoted",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{gateway_base_url}}/api/admin/merchants/1/make-admin",
+									"host": ["{{gateway_base_url}}"],
+									"path": ["api", "admin", "merchants", "1", "make-admin"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [{"key": "Content-Type", "value": "application/json"}],
+							"cookie": [],
+							"body": "{\n    \"message\": \"Merchant promoted to admin successfully\",\n    \"merchant\": {\n        \"id\": 1,\n        \"email\": \"merchant@example.com\",\n        \"is_admin\": true,\n        \"updated_at\": \"2024-01-15T10:45:00Z\"\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Remove Merchant Admin",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{merchant_api_key}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{gateway_base_url}}/api/admin/merchants/{{merchant_id}}/remove-admin",
+							"host": [
+								"{{gateway_base_url}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"merchants",
+								"{{merchant_id}}",
+								"remove-admin"
+							]
+						},
+						"description": "Remove admin status from a merchant. Requires admin authentication."
+					},
+					"response": [
+						{
+							"name": "Success - Admin Removed",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{gateway_base_url}}/api/admin/merchants/1/remove-admin",
+									"host": ["{{gateway_base_url}}"],
+									"path": ["api", "admin", "merchants", "1", "remove-admin"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [{"key": "Content-Type", "value": "application/json"}],
+							"cookie": [],
+							"body": "{\n    \"message\": \"Admin status removed successfully\",\n    \"merchant\": {\n        \"id\": 1,\n        \"email\": \"merchant@example.com\",\n        \"is_admin\": false,\n        \"updated_at\": \"2024-01-15T10:50:00Z\"\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Get System Statistics",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{merchant_api_key}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{gateway_base_url}}/api/admin/stats",
+							"host": [
+								"{{gateway_base_url}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"stats"
+							]
+						},
+						"description": "Get system-wide statistics including total merchants, transactions, and balances. Requires admin authentication."
+					},
+					"response": [
+						{
+							"name": "Success - System Stats",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{gateway_base_url}}/api/admin/stats",
+									"host": ["{{gateway_base_url}}"],
+									"path": ["api", "admin", "stats"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [{"key": "Content-Type", "value": "application/json"}],
+							"cookie": [],
+							"body": "{\n    \"stats\": {\n        \"total_merchants\": 50,\n        \"active_merchants\": 45,\n        \"total_transactions\": 1250,\n        \"completed_transactions\": 1100,\n        \"total_usdt_balance\": 5000.75\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Create Merchant (Admin)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var jsonData = pm.response.json();",
+									"    console.log(\"Merchant created successfully!\");",
+									"    console.log(\"API Key: \" + jsonData.merchant.api_key);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{merchant_api_key}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"newmerchant@example.com\",\n    \"password\": \"SecurePassword123!\",\n    \"business_name\": \"New Business\"\n}"
+						},
+						"url": {
+							"raw": "{{gateway_base_url}}/api/admin/merchants",
+							"host": [
+								"{{gateway_base_url}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"merchants"
+							]
+						},
+						"description": "Create a new merchant account. Requires admin authentication."
+					},
+					"response": [
+						{
+							"name": "Success - Merchant Created",
+							"originalRequest": {
+								"method": "POST",
+								"header": [{"key": "Content-Type", "value": "application/json"}],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"newmerchant@example.com\",\n    \"password\": \"SecurePassword123!\",\n    \"business_name\": \"New Business\"\n}"
+								},
+								"url": {
+									"raw": "{{gateway_base_url}}/api/admin/merchants",
+									"host": ["{{gateway_base_url}}"],
+									"path": ["api", "admin", "merchants"]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [{"key": "Content-Type", "value": "application/json"}],
+							"cookie": [],
+							"body": "{\n    \"message\": \"Merchant created successfully\",\n    \"merchant\": {\n        \"id\": 2,\n        \"email\": \"newmerchant@example.com\",\n        \"business_name\": \"New Business\",\n        \"api_key\": \"sk_new123xyz456def789ghi012jkl345mno678pqr901stu234vwx567yz\",\n        \"merchant_id\": 0,\n        \"is_active\": true,\n        \"is_admin\": false,\n        \"created_at\": \"2024-01-15T11:00:00Z\"\n    }\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Login Merchant (Legacy)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"{{merchant_email}}\",\n    \"password\": \"{{merchant_password}}\"\n}"
+						},
+						"url": {
+							"raw": "{{gateway_base_url}}/api/merchants/login",
+							"host": [
+								"{{gateway_base_url}}"
+							],
+							"path": [
+								"api",
+								"merchants",
+								"login"
+							]
+						},
+						"description": "Legacy login endpoint. For new implementations, use API keys from merchant creation instead."
+					},
+					"response": [
+						{
+							"name": "Success - Login",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"merchant@example.com\",\n    \"password\": \"SecurePassword123!\"\n}"
+								},
+								"url": {
+									"raw": "{{gateway_base_url}}/api/merchants/login",
+									"host": ["{{gateway_base_url}}"],
+									"path": ["api", "merchants", "login"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"Login successful\",\n    \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZXJjaGFudF9pZCI6MSwidHlwZSI6Im1lcmNoYW50In0.example\",\n    \"merchant_id\": 1,\n    \"business_name\": \"My Business\",\n    \"email\": \"merchant@example.com\",\n    \"api_key\": \"merch_abc123xyz456def789ghi012jkl345mno678pqr901stu234vwx567yz\",\n    \"trc20_address\": \"TRXAddressHere\",\n    \"is_admin\": false\n}"
+						},
+						{
+							"name": "Error - Invalid Credentials",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"merchant@example.com\",\n    \"password\": \"wrongpassword\"\n}"
+								},
+								"url": {
+									"raw": "{{gateway_base_url}}/api/merchants/login",
+									"host": ["{{gateway_base_url}}"],
+									"path": ["api", "merchants", "login"]
+								}
+							},
+							"status": "Unauthorized",
+							"code": 401,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"error\": \"login failed: invalid password\"\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Merchant Solana Address",
+			"item": [
+				{
+					"name": "Save Solana Address",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    console.log(\"Solana address saved: \" + jsonData.solana_address);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{merchant_api_key}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"solana_address\": \"7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU\"\n}"
+						},
+						"url": {
+							"raw": "{{gateway_base_url}}/api/merchants/solana/address",
+							"host": [
+								"{{gateway_base_url}}"
+							],
+							"path": [
+								"api",
+								"merchants",
+								"solana",
+								"address"
+							]
+						},
+						"description": "Save merchant's Solana address where they will receive payments. This address will be used for all payment requests."
+					},
+					"response": [
+						{
+							"name": "Success - Address Saved",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"solana_address\": \"7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU\"\n}"
+								},
+								"url": {
+									"raw": "{{gateway_base_url}}/api/merchants/solana/address",
+									"host": ["{{gateway_base_url}}"],
+									"path": ["api", "merchants", "solana", "address"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"Solana address saved successfully\",\n    \"solana_address\": \"7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Merchant Balance",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    console.log(\"Merchant Balance: \" + jsonData.usdt_balance + \" USDT\");",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{merchant_api_key}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{gateway_base_url}}/api/merchants/balance",
+							"host": [
+								"{{gateway_base_url}}"
+							],
+							"path": [
+								"api",
+								"merchants",
+								"balance"
+							]
+						},
+						"description": "Get merchant's USDT balance from database. This balance is updated when deposits are confirmed."
+					},
+					"response": [
+						{
+							"name": "Success - Balance Retrieved",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{gateway_base_url}}/api/merchants/balance",
+									"host": ["{{gateway_base_url}}"],
+									"path": ["api", "merchants", "balance"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"merchant_id\": 1,\n    \"email\": \"merchant@example.com\",\n    \"usdt_balance\": 10.5,\n    \"solana_address\": \"7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU\"\n}"
+						}
+					]
+				},
+				{
+					"name": "List Merchant Transactions",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    console.log(\"Total transactions: \" + jsonData.count);",
+									"    jsonData.transactions.forEach(function(tx) {",
+									"        console.log(\"Transaction \" + tx.id + \": \" + tx.amount + \" \" + tx.asset + \" - Status: \" + tx.status);",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{merchant_api_key}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{gateway_base_url}}/api/merchants/transactions",
+							"host": [
+								"{{gateway_base_url}}"
+							],
+							"path": [
+								"api",
+								"merchants",
+								"transactions"
+							]
+						},
+						"description": "Get all transactions for the authenticated merchant. Includes transaction status (pending, completed, failed)."
+					},
+					"response": [
+						{
+							"name": "Success - Transactions List",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{gateway_base_url}}/api/merchants/transactions",
+									"host": ["{{gateway_base_url}}"],
+									"path": ["api", "merchants", "transactions"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"transactions\": [\n        {\n            \"id\": 1,\n            \"deposit_id\": 13,\n            \"merchant_deposit_id\": \"ORDER-12345\",\n            \"merchant_id\": 1,\n            \"solana_address\": \"A9xLqgmfdW3QXnFw7kwmRDzGBbQV2uMDGv95BgFp11g8\",\n            \"amount\": 0.1,\n            \"asset\": \"USDT\",\n            \"status\": \"completed\",\n            \"tx_id\": \"2ABLi5JpedbVF4bD3yQmQ3c2Bpfs924CtSs2rhEnvobkjxgc4M7grv7ZWJrCzi5uceCZpSs3mCjKNdBuMae6BYeJ\",\n            \"slot\": 394501791,\n            \"confirmations\": 1,\n            \"created_at\": \"2024-01-15T10:30:00Z\",\n            \"updated_at\": \"2024-01-15T10:35:00Z\"\n        },\n        {\n            \"id\": 2,\n            \"deposit_id\": 14,\n            \"merchant_deposit_id\": \"ORDER-12346\",\n            \"merchant_id\": 1,\n            \"solana_address\": \"B8yMqrgeW4RYoGw8lxmSEzHCcRV3vNEHw96ChGq22h9H\",\n            \"amount\": 0.2,\n            \"asset\": \"USDT\",\n            \"status\": \"pending\",\n            \"tx_id\": \"\",\n            \"slot\": 0,\n            \"confirmations\": 0,\n            \"created_at\": \"2024-01-15T10:40:00Z\",\n            \"updated_at\": \"2024-01-15T10:40:00Z\"\n        }\n    ],\n    \"count\": 2\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Solana Addresses",
+			"item": [
+				{
+					"name": "List Solana Addresses",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    console.log(\"Found \" + jsonData.addresses.length + \" Solana addresses\");",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{merchant_api_key}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{gateway_base_url}}/api/merchants/solana/addresses",
+							"host": [
+								"{{gateway_base_url}}"
+							],
+							"path": [
+								"api",
+								"merchants",
+								"solana",
+								"addresses"
+							]
+						},
+						"description": "List all Solana addresses for the authenticated merchant. Should show 20 addresses (auto-generated on registration). Requires authentication."
+					},
+					"response": [
+						{
+							"name": "Success - List Addresses",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{gateway_base_url}}/api/merchants/solana/addresses",
+									"host": ["{{gateway_base_url}}"],
+									"path": ["api", "merchants", "solana", "addresses"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"addresses\": [\n        {\n            \"id\": 1,\n            \"address\": \"7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU\",\n            \"sequence\": 0,\n            \"is_active\": true,\n            \"is_used\": false,\n            \"created_at\": \"2024-01-15T10:30:00Z\"\n        },\n        {\n            \"id\": 2,\n            \"address\": \"9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM\",\n            \"sequence\": 1,\n            \"is_active\": true,\n            \"is_used\": true,\n            \"created_at\": \"2024-01-15T10:30:00Z\"\n        }\n    ]\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Addresses with Balances",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    console.log(\"Total addresses: \" + jsonData.count);",
+									"    console.log(\"Total USDT Balance: \" + jsonData.total_usdt_balance);",
+									"    console.log(\"\\nAddress Balances:\");",
+									"    jsonData.addresses.forEach(function(addr) {",
+									"        console.log(\"Address \" + addr.sequence + \": \" + addr.usdt_balance + \" USDT, \" + addr.sol_balance + \" SOL\");",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{merchant_api_key}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{gateway_base_url}}/api/merchants/solana/addresses/balances",
+							"host": [
+								"{{gateway_base_url}}"
+							],
+							"path": [
+								"api",
+								"merchants",
+								"solana",
+								"addresses",
+								"balances"
+							]
+						},
+						"description": "Get all Solana addresses for the merchant with their USDT and SOL balances. Returns balance per address and total USDT balance across all addresses. Requires authentication."
+					},
+					"response": [
+						{
+							"name": "Success - Addresses with Balances",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{gateway_base_url}}/api/merchants/solana/addresses/balances",
+									"host": ["{{gateway_base_url}}"],
+									"path": ["api", "merchants", "solana", "addresses", "balances"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"addresses\": [\n        {\n            \"id\": 1,\n            \"address\": \"7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU\",\n            \"sequence\": 0,\n            \"is_active\": true,\n            \"is_used\": true,\n            \"usdt_balance\": 10.5,\n            \"sol_balance\": 0.001,\n            \"created_at\": \"2024-01-15T10:30:00Z\"\n        },\n        {\n            \"id\": 2,\n            \"address\": \"9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM\",\n            \"sequence\": 1,\n            \"is_active\": true,\n            \"is_used\": false,\n            \"usdt_balance\": 0.0,\n            \"sol_balance\": 0.0,\n            \"created_at\": \"2024-01-15T10:30:00Z\"\n        }\n    ],\n    \"total_usdt_balance\": 10.5,\n    \"count\": 2\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Solana Deposits",
+			"item": [
+				{
+					"name": "Initiate Solana Deposit",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set(\"solana_deposit_id\", jsonData.deposit_id);",
+									"    pm.environment.set(\"solana_deposit_page_url\", jsonData.page_url);",
+									"    console.log(\"Deposit ID: \" + jsonData.deposit_id);",
+									"    console.log(\"Deposit Page URL: \" + jsonData.page_url);",
+									"    console.log(\"Share this URL with customer to receive payment!\");",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{merchant_api_key}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"expected_amount\": 10.5,\n    \"webhook_url\": \"https://yourapp.com/webhook\",\n    \"notes\": \"Payment for order #123\",\n    \"deposit_id\": \"ORDER-12345\"\n}"
+						},
+						"url": {
+							"raw": "{{gateway_base_url}}/api/merchants/solana/deposit/initiate",
+							"host": [
+								"{{gateway_base_url}}"
+							],
+							"path": [
+								"api",
+								"merchants",
+								"solana",
+								"deposit",
+								"initiate"
+							]
+						},
+						"description": "Create a new Solana deposit request. Returns a public page URL that you can share with customers. The deposit expires after 10 minutes if no USDT is received. System automatically monitors the address for incoming transactions and sends webhook when confirmed. Requires authentication."
+					},
+					"response": [
+						{
+							"name": "Success - Deposit Initiated",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"expected_amount\": 10.5,\n    \"webhook_url\": \"https://yourapp.com/webhook\",\n    \"notes\": \"Payment for order #123\",\n    \"deposit_id\": \"ORDER-12345\"\n}"
+								},
+								"url": {
+									"raw": "{{gateway_base_url}}/api/merchants/solana/deposit/initiate",
+									"host": ["{{gateway_base_url}}"],
+									"path": ["api", "merchants", "solana", "deposit", "initiate"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"deposit_id\": 123,\n    \"status\": \"pending\",\n    \"message\": \"Deposit initiated. Share the page URL with your customer.\",\n    \"page_url\": \"https://api.swapuzi.com/merchants/solana/deposit/123/page\",\n    \"expected_amount\": 10.5,\n    \"order_id\": \"\",\n    \"expires_at\": \"2024-01-15T10:40:00Z\",\n    \"created_at\": \"2024-01-15T10:30:00Z\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Solana Deposit Status",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    console.log(\"Deposit Status: \" + jsonData.status);",
+									"    console.log(\"Expected Amount: \" + jsonData.expected_amount);",
+									"    console.log(\"Received Amount: \" + jsonData.received_amount);",
+									"    if (jsonData.status === \"confirmed\") {",
+									"        console.log(\"✅ Deposit confirmed! Transaction: \" + jsonData.transaction.tx_id);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{merchant_api_key}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{gateway_base_url}}/api/merchants/solana/deposit/{{solana_deposit_id}}",
+							"host": [
+								"{{gateway_base_url}}"
+							],
+							"path": [
+								"api",
+								"merchants",
+								"solana",
+								"deposit",
+								"{{solana_deposit_id}}"
+							]
+						},
+						"description": "Check the status of a Solana deposit. Returns deposit details including transaction information if confirmed. Use this to monitor deposit status. Requires authentication."
+					},
+					"response": [
+						{
+							"name": "Success - Deposit Pending",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{gateway_base_url}}/api/merchants/solana/deposit/123",
+									"host": ["{{gateway_base_url}}"],
+									"path": ["api", "merchants", "solana", "deposit", "123"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"deposit_id\": 123,\n    \"solana_address\": \"7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU\",\n    \"status\": \"pending\",\n    \"expected_amount\": 10.5,\n    \"received_amount\": 0.0,\n    \"order_id\": \"ORDER123\",\n    \"created_at\": \"2024-01-15T10:30:00Z\"\n}"
+						},
+						{
+							"name": "Success - Deposit Confirmed",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{gateway_base_url}}/api/merchants/solana/deposit/123",
+									"host": ["{{gateway_base_url}}"],
+									"path": ["api", "merchants", "solana", "deposit", "123"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"deposit_id\": 123,\n    \"solana_address\": \"7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU\",\n    \"status\": \"confirmed\",\n    \"expected_amount\": 10.5,\n    \"received_amount\": 10.5,\n    \"order_id\": \"ORDER123\",\n    \"created_at\": \"2024-01-15T10:30:00Z\",\n    \"transaction\": {\n        \"tx_id\": \"5j7s8K9mN2pQ4rT6vW8xY0zA1bC3dE5fG7hI9jK1lM3nO5pQ7rS9tU1vW3xY5z\",\n        \"from_address\": \"ABC123xyz...\",\n        \"to_address\": \"7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU\",\n        \"amount\": 10.5,\n        \"asset\": \"USDT\",\n        \"slot\": 123456789,\n        \"confirmations\": 32,\n        \"block_time\": \"2024-01-15T10:35:00Z\"\n    }\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Public Deposit Pages",
+			"item": [
+				{
+					"name": "View Deposit Page (Public)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{gateway_base_url}}/api/merchants/solana/deposit/{{solana_deposit_id}}/page",
+							"host": [
+								"{{gateway_base_url}}"
+							],
+							"path": [
+								"api",
+								"merchants",
+								"solana",
+								"deposit",
+								"{{solana_deposit_id}}",
+								"page"
+							]
+						},
+						"description": "Public HTML page showing deposit details, Solana address, expected amount, and 10-minute countdown timer. This is the page you share with customers. No authentication required. Opens in browser."
+					},
+					"response": [
+						{
+							"name": "Success - Deposit Page HTML",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{gateway_base_url}}/api/merchants/solana/deposit/123/page",
+									"host": ["{{gateway_base_url}}"],
+									"path": ["api", "merchants", "solana", "deposit", "123", "page"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "html",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "text/html; charset=utf-8"
+								}
+							],
+							"cookie": [],
+							"body": "<!DOCTYPE html>\n<html>\n<head>\n    <title>Solana Deposit - Order #123</title>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n</head>\n<body>\n    <h1>Send USDT to Complete Payment</h1>\n    <p>Send <strong>10.5 USDT</strong> to:</p>\n    <p><code>7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU</code></p>\n    <p>Status: <span id=\"status\">Pending</span></p>\n    <p>Time remaining: <span id=\"countdown\">9:45</span></p>\n</body>\n</html>"
+						}
+					]
+				},
+				{
+					"name": "Get Public Deposit Status",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    console.log(\"Status: \" + jsonData.status);",
+									"    console.log(\"Received Amount: \" + jsonData.received_amount);",
+									"    console.log(\"Is Expired: \" + jsonData.is_expired);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{gateway_base_url}}/api/merchants/solana/deposit/{{solana_deposit_id}}/status-public",
+							"host": [
+								"{{gateway_base_url}}"
+							],
+							"path": [
+								"api",
+								"merchants",
+								"solana",
+								"deposit",
+								"{{solana_deposit_id}}",
+								"status-public"
+							]
+						},
+						"description": "Public endpoint to check deposit status (used by the deposit page for auto-refresh). Returns JSON with status, received amount, and expiration status. No authentication required."
+					},
+					"response": [
+						{
+							"name": "Success - Public Status (Pending)",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{gateway_base_url}}/api/merchants/solana/deposit/123/status-public",
+									"host": ["{{gateway_base_url}}"],
+									"path": ["api", "merchants", "solana", "deposit", "123", "status-public"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"pending\",\n    \"received_amount\": 0.0,\n    \"is_expired\": false\n}"
+						},
+						{
+							"name": "Success - Public Status (Confirmed)",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{gateway_base_url}}/api/merchants/solana/deposit/123/status-public",
+									"host": ["{{gateway_base_url}}"],
+									"path": ["api", "merchants", "solana", "deposit", "123", "status-public"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"confirmed\",\n    \"received_amount\": 10.5,\n    \"is_expired\": false\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Solana Withdraw",
+			"item": [
+				{
+					"name": "Withdraw USDT from Solana Addresses",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200 || pm.response.code === 206) {",
+									"    var jsonData = pm.response.json();",
+									"    console.log(\"✅ Withdrawal processed!\");",
+									"    console.log(\"Total USDT found: \" + jsonData.total_found);",
+									"    console.log(\"Total withdrawn: \" + jsonData.total_withdrawn);",
+									"    console.log(\"Successful withdrawals: \" + jsonData.successful_withdrawals);",
+									"    console.log(\"Failed withdrawals: \" + jsonData.failed_withdrawals);",
+									"    console.log(\"\\nWithdrawal Details:\");",
+									"    jsonData.withdrawals.forEach(function(wd) {",
+									"        if (wd.status === 'success') {",
+									"            console.log(\"✅ \" + wd.from_address.substring(0, 8) + \"... -> \" + wd.amount + \" USDT (Tx: \" + wd.tx_id.substring(0, 16) + \"...)\");",
+									"        } else {",
+									"            console.log(\"❌ \" + wd.from_address.substring(0, 8) + \"... -> \" + wd.amount + \" USDT (Error: \" + wd.error + \")\");",
+									"        }",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{merchant_api_key}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"destination_address\": \"ABC123xyz...\"\n}"
+						},
+						"url": {
+							"raw": "{{gateway_base_url}}/api/merchants/solana/withdraw",
+							"host": [
+								"{{gateway_base_url}}"
+							],
+							"path": [
+								"api",
+								"merchants",
+								"solana",
+								"withdraw"
+							]
+						},
+						"description": "Withdraw all USDT from all merchant Solana addresses to a single destination address. The system automatically:\n1. Checks all merchant's Solana addresses for USDT balance\n2. Sends USDT from each address with balance to the destination\n3. Creates transaction records for each withdrawal\n4. Returns detailed results including transaction IDs\n\n**Note:** Only withdraws from addresses that belong to the authenticated merchant. Private keys are used securely to sign transactions. Requires authentication."
+					},
+					"response": [
+						{
+							"name": "Success - All Withdrawals Successful",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"destination_address\": \"ABC123xyz...\"\n}"
+								},
+								"url": {
+									"raw": "{{gateway_base_url}}/api/merchants/solana/withdraw",
+									"host": ["{{gateway_base_url}}"],
+									"path": ["api", "merchants", "solana", "withdraw"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"Withdrawal processed\",\n    \"destination_address\": \"ABC123xyz789DEF456ghi012JKL345mno678PQR901stu234VWX567yz\",\n    \"total_found\": 25.5,\n    \"total_withdrawn\": 25.5,\n    \"successful_withdrawals\": 2,\n    \"failed_withdrawals\": 0,\n    \"withdrawals\": [\n        {\n            \"from_address\": \"7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU\",\n            \"amount\": 10.5,\n            \"tx_id\": \"5j7s8K9mN2pQ4rT6vW8xY0zA1bC3dE5fG7hI9jK1lM3nO5pQ7rS9tU1vW3xY5z\",\n            \"status\": \"success\"\n        },\n        {\n            \"from_address\": \"9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM\",\n            \"amount\": 15.0,\n            \"tx_id\": \"3k4l5m6n7o8p9q0r1s2t3u4v5w6x7y8z9a0b1c2d3e4f5g6h7i8j9k0l1m2n3\",\n            \"status\": \"success\"\n        }\n    ]\n}"
+						},
+						{
+							"name": "Partial Success - Some Withdrawals Failed",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"destination_address\": \"ABC123xyz...\"\n}"
+								},
+								"url": {
+									"raw": "{{gateway_base_url}}/api/merchants/solana/withdraw",
+									"host": ["{{gateway_base_url}}"],
+									"path": ["api", "merchants", "solana", "withdraw"]
+								}
+							},
+							"status": "Partial Content",
+							"code": 206,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"Some withdrawals succeeded, some failed\",\n    \"destination_address\": \"ABC123xyz789DEF456ghi012JKL345mno678PQR901stu234VWX567yz\",\n    \"total_found\": 25.5,\n    \"total_withdrawn\": 10.5,\n    \"successful_withdrawals\": 1,\n    \"failed_withdrawals\": 1,\n    \"withdrawals\": [\n        {\n            \"from_address\": \"7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU\",\n            \"amount\": 10.5,\n            \"tx_id\": \"5j7s8K9mN2pQ4rT6vW8xY0zA1bC3dE5fG7hI9jK1lM3nO5pQ7rS9tU1vW3xY5z\",\n            \"status\": \"success\"\n        },\n        {\n            \"from_address\": \"9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM\",\n            \"amount\": 15.0,\n            \"status\": \"failed\",\n            \"error\": \"Network error, kindly retry\"\n        }\n    ]\n}"
+						},
+						{
+							"name": "Error - No USDT Balance",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"destination_address\": \"ABC123xyz...\"\n}"
+								},
+								"url": {
+									"raw": "{{gateway_base_url}}/api/merchants/solana/withdraw",
+									"host": ["{{gateway_base_url}}"],
+									"path": ["api", "merchants", "solana", "withdraw"]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"error\": \"withdraw failed: No USDT balance found on any of your Solana addresses\"\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Webhooks",
+			"item": [
+				{
+					"name": "HexPay Webhook (Internal)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"event\": \"deposit.confirmed\",\n  \"merchant_id\": 1,\n  \"deposit_id\": 13,\n  \"merchant_deposit_id\": \"ORDER-12345\",\n  \"tx_id\": \"2ABLi5JpedbVF4bD3yQmQ3c2Bpfs924CtSs2rhEnvobkjxgc4M7grv7ZWJrCzi5uceCZpSs3mCjKNdBuMae6BYeJ\",\n  \"solana_address\": \"A9xLqgmfdW3QXnFw7kwmRDzGBbQV2uMDGv95BgFp11g8\",\n  \"amount\": 0.1,\n  \"received_amount\": 0.1,\n  \"expected_amount\": 0.1,\n  \"payment_status\": \"paid\",\n  \"status\": \"confirmed\",\n  \"asset\": \"USDT\",\n  \"slot\": 394501791,\n  \"confirmations\": 1,\n  \"timestamp\": 1768812339\n}"
+						},
+						"url": {
+							"raw": "{{gateway_base_url}}/api/webhooks/hexpay",
+							"host": [
+								"{{gateway_base_url}}"
+							],
+							"path": [
+								"api",
+								"webhooks",
+								"hexpay"
+							]
+						},
+						"description": "Internal webhook endpoint that receives callbacks from HexPay. Maps deposit to merchant using merchant_deposit_id, updates merchant balance in database, and forwards webhook to merchant's webhook URL. No authentication required."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Health Check",
+			"item": [
+				{
+					"name": "Health Check",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{gateway_base_url}}/health",
+							"host": [
+								"{{gateway_base_url}}"
+							],
+							"path": [
+								"health"
+							]
+						},
+						"description": "Health check endpoint to verify the gateway service is running. No authentication required."
+					},
+					"response": [
+						{
+							"name": "Success - Service Healthy",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{gateway_base_url}}/health",
+									"host": ["{{gateway_base_url}}"],
+									"path": ["health"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"ok\"\n}"
+						}
+					]
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "gateway_base_url",
+			"value": "http://localhost:8080",
+			"type": "string"
+		},
+		{
+			"key": "merchant_email",
+			"value": "merchant@example.com",
+			"type": "string"
+		},
+		{
+			"key": "merchant_password",
+			"value": "SecurePassword123!",
+			"type": "string"
+		},
+		{
+			"key": "merchant_api_key",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "merchant_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "solana_deposit_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "solana_deposit_page_url",
+			"value": "",
+			"type": "string"
+		}
+	]
+}

@@ -1,0 +1,738 @@
+{
+	"info": {
+		"_postman_id": "globpay-dashboard-api-collection",
+		"name": "Globpay Dashboard API",
+		"description": "Complete API collection for Globpay Dashboard. Import this collection into Postman to test all dashboard APIs.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{auth_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "https://merchants.globpay.ai",
+			"type": "string"
+		},
+		{
+			"key": "auth_token",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.token) {",
+									"        pm.collectionVariables.set('auth_token', jsonData.token);",
+									"        console.log('Token saved to collection variable');",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"user\": {\n    \"email\": \"your-email@example.com\",\n    \"password\": \"your-password\"\n  }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/users/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"login"
+							]
+						},
+						"description": "Authenticate user and get bearer token. The token will be automatically saved to collection variable 'auth_token'."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Transactions",
+			"item": [
+				{
+					"name": "Get Transaction List (Paginated)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/merchants/transaction/list?page=1&limit=50",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"merchants",
+								"transaction",
+								"list"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1",
+									"description": "Page number (must be >= 1)"
+								},
+								{
+									"key": "limit",
+									"value": "50",
+									"description": "Number of records per page (1-100, max 100)"
+								}
+							]
+						},
+						"description": "Get paginated list of transactions. Returns transactions with pagination metadata."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Transaction List (Legacy)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/transaction/list",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"transaction",
+								"list"
+							]
+						},
+						"description": "Get all transactions (legacy endpoint, may be slow for large datasets)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Transaction Balance",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/transaction/read/balance",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"transaction",
+								"read",
+								"balance"
+							]
+						},
+						"description": "Get payout balance information"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Payins Balance",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/transaction/read/payins/balance",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"transaction",
+								"read",
+								"payins",
+								"balance"
+							]
+						},
+						"description": "Get payin balance information"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Mobile Payins",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/transaction/read/payins",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"transaction",
+								"read",
+								"payins"
+							]
+						},
+						"description": "Get mobile payin transactions"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Bank Transactions",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/transaction/read/bank",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"transaction",
+								"read",
+								"bank"
+							]
+						},
+						"description": "Get bank transactions"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Card Transactions",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/transaction/read/card",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"transaction",
+								"read",
+								"card"
+							]
+						},
+						"description": "Get card transactions"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Mobile Payouts",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/transaction/read/mobile/payouts",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"transaction",
+								"read",
+								"mobile",
+								"payouts"
+							]
+						},
+						"description": "Get mobile payout transactions"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "Get Users List",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/users/list",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"list"
+							]
+						},
+						"description": "Get list of all users"
+					},
+					"response": []
+				},
+				{
+					"name": "Create User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"user\": {\n    \"name\": \"John Doe\",\n    \"email\": \"john.doe@example.com\",\n    \"phone\": \"+254712345678\",\n    \"password\": \"securePassword123\",\n    \"role\": 2,\n    \"status\": \"active\",\n    \"location\": \"Nairobi\",\n    \"merchantId\": \"merchant123\",\n    \"BaseCurrencyID\": 1\n  }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/users/create",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"create"
+							]
+						},
+						"description": "Create a new user"
+					},
+					"response": []
+				},
+				{
+					"name": "Update User",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"user\": {\n    \"name\": \"John Doe Updated\",\n    \"email\": \"john.doe@example.com\",\n    \"phone\": \"+254712345678\",\n    \"role\": 2,\n    \"status\": \"active\",\n    \"location\": \"Nairobi\",\n    \"merchantId\": \"merchant123\",\n    \"BaseCurrencyID\": 1\n  }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/users/update/:userId",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"update",
+								":userId"
+							],
+							"variable": [
+								{
+									"key": "userId",
+									"value": "1",
+									"description": "User ID to update"
+								}
+							]
+						},
+						"description": "Update an existing user"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Merchants",
+			"item": [
+				{
+					"name": "Get Merchants List",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/merchants/list",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"merchants",
+								"list"
+							]
+						},
+						"description": "Get list of all merchants"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Merchant",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Merchant Name\",\n  \"industry\": \"E-commerce\",\n  \"regions\": \"Kenya, Uganda\",\n  \"status\": \"Live\",\n  \"accountManager\": \"Manager Name\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/merchants/update/:merchantId",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"merchants",
+								"update",
+								":merchantId"
+							],
+							"variable": [
+								{
+									"key": "merchantId",
+									"value": "1",
+									"description": "Merchant ID to update"
+								}
+							]
+						},
+						"description": "Update merchant details"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Forex",
+			"item": [
+				{
+					"name": "Get Forex Rates List",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/forex/list",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"forex",
+								"list"
+							]
+						},
+						"description": "Get list of all forex rates"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Forex Rate",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"Forex\": {\n    \"currencyCode\": \"KES\",\n    \"currencyName\": \"Kenyan Shilling\",\n    \"conversionRate\": 100.50,\n    \"supported\": 1\n  }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/forex/create",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"forex",
+								"create"
+							]
+						},
+						"description": "Create a new forex rate"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Forex Rate",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"currencyCode\": \"KES\",\n  \"currencyName\": \"Kenyan Shilling\",\n  \"conversionRate\": 101.25,\n  \"supported\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/forex/update/:forexId",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"forex",
+								"update",
+								":forexId"
+							],
+							"variable": [
+								{
+									"key": "forexId",
+									"value": "1",
+									"description": "Forex rate ID to update"
+								}
+							]
+						},
+						"description": "Update an existing forex rate"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Forex Rate",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/forex/delete/:forexId",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"forex",
+								"delete",
+								":forexId"
+							],
+							"variable": [
+								{
+									"key": "forexId",
+									"value": "1",
+									"description": "Forex rate ID to delete"
+								}
+							]
+						},
+						"description": "Delete a forex rate"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Payment Links",
+			"item": [
+				{
+					"name": "Get Payment Links List",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/links/list",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"links",
+								"list"
+							]
+						},
+						"description": "Get list of all payment links"
+					},
+					"response": []
+				},
+				{
+					"name": "Generate Payment Link",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"amount\": 1000,\n  \"currency\": \"KES\",\n  \"merchant\": \"merchant123\",\n  \"type\": \"MPESA\",\n  \"description\": \"Payment for services\",\n  \"expiresAt\": \"2024-12-31T23:59:59Z\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/links/generate",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"links",
+								"generate"
+							]
+						},
+						"description": "Generate a new payment link"
+					},
+					"response": []
+				},
+				{
+					"name": "Process Payment Link",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"token\": \"payment-link-token\",\n  \"impalaMerchantId\": \"merchant123\",\n  \"currency\": \"KES\",\n  \"amount\": 1000,\n  \"payerPhone\": \"254794940160\",\n  \"mobileMoneySP\": \"MPESA\",\n  \"externalId\": \"PaymentLink123\",\n  \"callbackUrl\": \"https://webhook.site/your-webhook-url\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/links/process",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"links",
+								"process"
+							]
+						},
+						"description": "Process a payment using a payment link"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Wallet Transfers",
+			"item": [
+				{
+					"name": "View Drawings",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/drawings/view",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"drawings",
+								"view"
+							]
+						},
+						"description": "View platform earnings/drawings"
+					},
+					"response": []
+				},
+				{
+					"name": "Transfer to Payout",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Transfer Name\",\n  \"description\": \"Transfer description\",\n  \"merchantId\": \"merchant123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/drawings/transfer/toPayout",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"drawings",
+								"transfer",
+								"toPayout"
+							]
+						},
+						"description": "Transfer funds to payout"
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
+

@@ -1,0 +1,26 @@
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # Do not rewrite requests for actual files and directories (static assets)
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+
+  # SPA fallback: serve index.html for all other requests
+  RewriteRule ^ index.html [L]
+</IfModule>
+
+# Ensure correct MIME types for module scripts (fix "Expected a JavaScript module" error)
+<IfModule mod_mime.c>
+  AddType application/javascript .js
+  AddType text/css .css
+  AddCharset utf-8 .js .css
+</IfModule>
+
+# Optional: cache static assets
+<IfModule mod_headers.c>
+  <FilesMatch "\.(js|css)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+</IfModule>

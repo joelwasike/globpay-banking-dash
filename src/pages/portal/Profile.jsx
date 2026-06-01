@@ -22,7 +22,6 @@ export default function PortalProfilePage() {
   const [profile, setProfile] = useState(null);
   const [copied, setCopied] = useState(false);
   const [callbackOpen, setCallbackOpen] = useState(false);
-  const [selectedVA, setSelectedVA] = useState('');
   const [callbackUrl, setCallbackUrl] = useState('');
   const [callbackSaving, setCallbackSaving] = useState(false);
   const [callbackError, setCallbackError] = useState('');
@@ -68,11 +67,10 @@ export default function PortalProfilePage() {
     };
   }, [api, user?.role]);
 
-  const openCallback = (va) => {
+  const openCallback = () => {
     setCallbackError('');
     setCallbackSuccess('');
-    setSelectedVA(va.virtual_account_number);
-    setCallbackUrl(va.callback_url || '');
+    setCallbackUrl(profile?.merchant?.callback_url || '');
     setCallbackOpen(true);
   };
 
@@ -81,10 +79,7 @@ export default function PortalProfilePage() {
     setCallbackSuccess('');
     try {
       setCallbackSaving(true);
-      await api.put('/api/v1/portal/merchant/virtual-accounts/callback-url', {
-        virtual_account_number: selectedVA,
-        callback_url: callbackUrl
-      });
+      await api.put('/api/v1/portal/merchant/callback-url', { callback_url: callbackUrl });
       setCallbackSuccess('Callback URL updated');
       const res = await api.get('/api/v1/portal/merchant/profile');
       setProfile(res.data?.data);
@@ -232,44 +227,34 @@ export default function PortalProfilePage() {
                 )}
               </Stack>
               <Typography variant="caption" color="text.secondary">
-                Click a virtual account to copy. Use “Set Callback URL” to receive IPNs.
+                Click a virtual account to copy.
               </Typography>
 
-              {(profile?.virtual_accounts || []).length > 0 && (
-                <Stack spacing={1} sx={{ mt: 1 }}>
-                  {(profile.virtual_accounts || []).map((a) => (
-                    <Stack
-                      key={(a.id || a.virtual_account_number) + '_cb'}
-                      direction={{ xs: 'column', md: 'row' }}
-                      spacing={1}
-                      sx={{ alignItems: { md: 'center' }, justifyContent: 'space-between' }}
-                    >
-                      <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
-                        {a.virtual_account_number}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary" sx={{ flex: 1, mx: { md: 2 }, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        {a.callback_url || 'No callback URL set'}
-                      </Typography>
-                      <Button size="small" variant="outlined" onClick={() => openCallback(a)}>
-                        Set Callback URL
-                      </Button>
-                    </Stack>
-                  ))}
+              <Divider sx={{ my: 1.25 }} />
+              <Stack direction={{ xs: 'column', md: 'row' }} spacing={1} sx={{ alignItems: { md: 'center' }, justifyContent: 'space-between' }}>
+                <Stack spacing={0.25} sx={{ minWidth: 240 }}>
+                  <Typography variant="subtitle1">Callback URL</Typography>
+                  <Typography variant="body2" color="text.secondary" sx={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {profile?.merchant?.callback_url || 'No callback URL set'}
+                  </Typography>
                 </Stack>
-              )}
+                <Button size="small" variant="outlined" onClick={openCallback}>
+                  Set Callback URL
+                </Button>
+              </Stack>
             </Stack>
           </Stack>
         </MainCard>
       </Grid>
 
       <Dialog open={callbackOpen} onClose={() => setCallbackOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>Virtual Account Callback URL</DialogTitle>
+        <DialogTitle>Merchant Callback URL</DialogTitle>
         <DialogContent dividers>
           <Stack spacing={2} sx={{ mt: 1 }}>
             {callbackError && <Alert severity="error">{callbackError}</Alert>}
             {callbackSuccess && <Alert severity="success">{callbackSuccess}</Alert>}
             <Typography variant="body2" color="text.secondary">
-              Virtual account: <span style={{ fontFamily: 'monospace' }}>{selectedVA}</span>
+              All IPN callbacks for this merchant’s virtual accounts will be forwarded here.
             </Typography>
             <TextField
               label="Callback URL"

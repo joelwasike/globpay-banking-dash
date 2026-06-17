@@ -1,8 +1,6 @@
 import axios from 'axios';
 
-// API base URL configuration
-// In local dev, call same-origin and let Vite proxy `/api/*` to avoid CORS.
-const API_BASE_URL = window.location.hostname === 'localhost' ? '' : 'https://vc.globpay.ai';
+const API_BASE_URL = 'https://vc.globpay.ai';
 
 console.log('API Configuration:', { API_BASE_URL });
 
